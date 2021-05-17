@@ -5,6 +5,7 @@ import Header from './components/Header';
 import TodoList from './components/TodoList';
 import TodoForm from './components/TodoForm';
 import Todo from './components/Todo';
+import Menu from './components/Menu';
 
 import './App.css';
 
@@ -16,6 +17,7 @@ function App() {
   return (
     <div className="App">
       <Header pageTitle={title} setPageTitle={setTitle} />
+      <Menu />
       <Switch >
         <Route exact path="/">
           <TodoList setPageTitle={setTitle} />
