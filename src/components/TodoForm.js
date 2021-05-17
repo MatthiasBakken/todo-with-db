@@ -22,6 +22,8 @@ const TodoForm = ( props ) => {
         initialValues={{
           taskName: '',
           description: '',
+          completed: false,
+          subtasks: '',
           dateCreated: 0,
         }}
         validationSchema={TodoFormSchema}
@@ -50,6 +52,16 @@ const TodoForm = ( props ) => {
             />
             {errors.description && touched.description ? (
               <div className="error-div" testid="description-error">{errors.description}</div>
+            ) : null}
+            <label testid="subtasks-label">Subtasks (Separate by comma): </label>
+            <Field
+              name="subtasks"
+              className={`${TODO}input`}
+              testid="subtasks-input"
+              placeholder="Get up, Walk over to shelf, Pick a book, Go sit down, Read the book"
+            />
+            {errors.subtasks && touched.subtasks ? (
+              <div className="error-div" testid="subtasks-error">{errors.subtasks}</div>
             ) : null}
             <span className={`${TODO}button-container`} testid="form-btn-container">
               <button
