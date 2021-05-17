@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { Formik, Form, Field } from 'formik';
 
@@ -9,11 +9,12 @@ import './TodoForm.css';
 const TODO = 'todo__';
 
 const TodoForm = ( props ) => {
-  // const { pageTitle } = props;
 
-  // useEffect( () => {
-  //   pageTitle( "CREATE NEW TODO" );
-  // }, [] );
+  const { setPageTitle } = props;
+
+  useEffect( () => {
+    setPageTitle( "CREATE A NEW TODO" );
+  }, [] );
   
   return (
     <div className={`${TODO}form-container`} testid="form-container">
