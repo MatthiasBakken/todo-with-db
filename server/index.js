@@ -6,27 +6,25 @@ const pool = require( './db' );
 app.use( cors() );
 app.use( express.json() );
 
-app.get( "/todos", async ( request, response, next ) => {
-  try {
-    await pool.query( 'SELECT * FROM todo', ( err, res ) => {
-      response.json( res.rows );
-    } );
-  } catch ( error ) {
-    return next( error );
-  }
+app.get( "/todos", ( request, response, next ) => {
+  pool.query( 'SELECT * FROM todo;SELECT * FROM subtasks', ( err, res ) => {
+    if ( err )
+      return next( err );
+    response.json( {todos: [res[0].rows], subtasks: [res[1].rows]} );
+  } )
 } );
 
 app.post( "/todos", async ( request, response, next ) => {
   try {
     const { id, name, description, completed, subtasksIds, subtasks } = request.body;
     await pool.query(
-      'INSERT INTO todo(id, name, description, completed, subtasks) VALUES($1, $2, $3, $4, $5)',
+      'INSERT INTO todo(id, name, description, completed, subtasksIds) VALUES($1, $2, $3, $4, $5)',
       [ id, name, description, completed, subtasksIds ],
       ( err, res ) => {
         if ( err ) return next( err );
       }
       )
-      if ( subtasks ) {
+    if ( subtasks ) {
       subtasks.forEach( task => {
         pool.query(
           'INSERT INTO subtasks(id, description, completed) VALUES($1, $2, $3)',
@@ -37,7 +35,7 @@ app.post( "/todos", async ( request, response, next ) => {
         )
       })
       }
-    response.json( { data: { success: "true", id: id, task: name, description: description, subtasks: {...subtasks} } } );
+    response.json( { data: { success: true, id: id, task: name, description: description, subtasks: [...subtasks] } } );
   } catch ( error ) {
     console.log( error );
   };
