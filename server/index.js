@@ -10,7 +10,7 @@ app.get( "/todos", ( request, response, next ) => {
   pool.query( 'SELECT * FROM todo;SELECT * FROM subtasks', ( err, res ) => {
     if ( err )
       return next( err );
-    response.json( {todos: res[0].rows, subtasks: res[1].rows} );
+    response.json( {success: true, todos: res[0].rows, subtasks: res[1].rows} );
   } )
 } );
 
@@ -35,7 +35,7 @@ app.post( "/todos", async ( request, response, next ) => {
         )
       })
       }
-    response.json( { data: { success: true, id: id, task: name, description: description, subtasks: [...subtasks] } } );
+    response.json( { success: true, id: id, task: name, description: description, subtasks: [...subtasks] } );
   } catch ( error ) {
     console.log( error );
   };
@@ -60,7 +60,7 @@ app.put( "/todos/:id", ( request, response, next ) => {
         ( err, res ) => {
           if ( err ) return next( err );
 
-          if ( index === fields.length - 1 ) response.json( { data: { success: "true", id: id } } );
+          if ( index === fields.length - 1 ) response.json( { success: true, id: id, ...request.body } );
         }
       );
     } );
@@ -89,7 +89,7 @@ app.delete( "/todos/:id", ( request, response, next ) => {
       })
       }
     } );
-    response.json( { data: { success: "true", id: id } } );
+    response.json( { success: true, id: id } );
   } catch ( error ) {
     return next( error );
   }

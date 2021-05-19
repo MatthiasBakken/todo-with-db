@@ -33,7 +33,7 @@ const TodoList = ( props ) => {
       subtasksids: [...subtasksIds]
     } )
       .then( res => {
-        console.log( res );
+        console.log( res.data );
         window.location.reload();
       } )
       .catch( err => {
@@ -41,13 +41,20 @@ const TodoList = ( props ) => {
       } );
     }
 
-  const handleCompleted = async ( taskId, completeStatus ) => {
-    await axios.put( `http://localhost:5000/todos/${taskId}`, {
+  const handleCompleted = ( taskId, completeStatus ) => {
+    let index = todos.find( todo => todo.id == taskId );
+    axios.put( `http://localhost:5000/todos/${taskId}`, {
       completed: !completeStatus
     } )
       .then( res => {
         console.log( res.data );
-        window.location.reload();
+        let tempTodos = [...todos];
+        tempTodos.forEach( todo => {
+          if ( todo.id === taskId ) {
+            todo.completed = !todo.completed;
+          }
+        })
+        setTodos( tempTodos );
       } )
       .catch( err => {
         console.error( err.message );
