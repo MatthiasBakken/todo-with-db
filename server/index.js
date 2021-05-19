@@ -10,14 +10,14 @@ app.get( "/todos", ( request, response, next ) => {
   pool.query( 'SELECT * FROM todo;SELECT * FROM subtasks', ( err, res ) => {
     if ( err )
       return next( err );
-    response.json( {todos: [res[0].rows], subtasks: [res[1].rows]} );
+    response.json( {todos: res[0].rows, subtasks: res[1].rows} );
   } )
 } );
 
 app.post( "/todos", async ( request, response, next ) => {
   try {
     const { id, name, description, completed, subtasksIds, subtasks } = request.body;
-    await pool.query(
+    pool.query(
       'INSERT INTO todo(id, name, description, completed, subtasksIds) VALUES($1, $2, $3, $4, $5)',
       [ id, name, description, completed, subtasksIds ],
       ( err, res ) => {
@@ -56,7 +56,7 @@ app.put( "/todos/:id", ( request, response, next ) => {
     fields.forEach( ( field, index ) => {
       pool.query(
         `UPDATE todo SET ${field}=($1) WHERE id=($2)`,
-        [ request.body[ field ], id ],
+        [ request.body[ field ], `${id}` ],
         ( err, res ) => {
           if ( err ) return next( err );
 
@@ -69,19 +69,19 @@ app.put( "/todos/:id", ( request, response, next ) => {
   }
 } );
 
-app.delete( "/todos/:id", async ( request, response, next ) => {
+app.delete( "/todos/:id", ( request, response, next ) => {
   try {
     const { id } = request.params;
     const { subtasksIds } = request.body;
 
-    await pool.query( 'DELETE FROM todo WHERE id=($1)', [ id ], ( err, res ) => {
+    pool.query( 'DELETE FROM todo WHERE id=($1)', [ id ], ( err, res ) => {
       if ( err ) return next( err );
 
       console.log( subtasksIds );
       if ( subtasksIds ) {
       subtasksIds.forEach( id => {
         pool.query(
-          'DELETE FROM subtasks WHERE id=($1)', [id],
+          'DELETE FROM subtasks WHERE id=($1)', [`${id}`],
           ( err, res ) => {
             if ( err ) return next( err );
           }

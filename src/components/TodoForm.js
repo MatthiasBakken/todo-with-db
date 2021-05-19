@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 
 import { Formik, Form, Field } from 'formik';
-
+import { v4 as uuidv4 } from 'uuid';
 import { TodoFormSchema } from "./TodoFormSchema";
+import axios from 'axios';
+
 import './TodoForm.css';
 
 
@@ -20,28 +22,53 @@ const TodoForm = ( props ) => {
     <div className={`${TODO}form-container`} testid="form-container">
       <Formik
         initialValues={{
-          taskName: '',
+          id: '',
+          name: '',
           description: '',
           completed: false,
-          subtasks: '',
-          dateCreated: 0,
+          subtasks: ''
         }}
         validationSchema={TodoFormSchema}
         onSubmit={( values ) => {
-          
+          const tempId = uuidv4();
+          let subtaskIdsArr = [];
+          let subtasksArr = [];
+          values.subtasks.split( ',' ).forEach( subtask => {
+            let tempId = uuidv4();
+            subtasksArr.push( {
+              id: tempId,
+              description: subtask,
+              completed: false
+            } );
+            subtaskIdsArr.push( tempId );
+          } );
+          axios.post( 'http://localhost:5000/todos', {
+            id: tempId,
+            name: values.name,
+            description: values.description,
+            completed: false,
+            subtasksIds: subtaskIdsArr,
+            subtasks: subtasksArr
+          } )
+            .then( res => {
+              console.log( res );
+            } )
+            .catch( err => {
+              console.error( err.message );
+            } );
         }}
       >
         {( { errors, touched, isValid, dirty } ) => (
           <Form className={`${TODO}form`} testid="todo-form">
-            <label testid="taskname-label">Todo: </label>
+            <label testid="name-label">Todo: </label>
             <Field
-              name="taskName"
+              name="name"
               className={`${TODO}input`}
-              testid="taskname-input"
+              testid="name-input"
               placeholder="Do something"
             />
-            {errors.taskName && touched.taskName ? (
-              <div className="error-div" testid="taskname-error">{errors.taskName}</div>
+            {errors.name && touched.name ? (
+              <div className="error-div" testid="name-error">{errors.name}</div>
             ) : null}
             <label testid="description-label">Description: </label>
             <Field
